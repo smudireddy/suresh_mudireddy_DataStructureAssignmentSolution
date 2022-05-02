@@ -43,22 +43,80 @@ class FloorSizeDetailsComparator implements Comparator<FloorSizeDeliveryDetails>
 }
 
 public class BuilderFloorSheduler {
-
+	
 	public BuilderFloorSheduler() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	static void readDeliveryPlan() {
+	static PriorityQueue<FloorSizeDeliveryDetails> readDeliveryPlan(Scanner scanner) {
+		
+		System.out.println("Enter the total no of floors in the building");
+		int noOfFloors = scanner.nextInt();
 
+		PriorityQueue<FloorSizeDeliveryDetails> floorSizeQueue = new PriorityQueue<FloorSizeDeliveryDetails>(noOfFloors, new FloorSizeDetailsComparator());
+
+		for (int day = 1; day <= noOfFloors; day++) {
+			
+			System.out.println("Enter the floor size given on day : " + day);
+			int size = scanner.nextInt(); 
+			
+			FloorSizeDeliveryDetails detail = new FloorSizeDeliveryDetails(size, day);
+			floorSizeQueue.add(detail);
+		}
+		
+		return floorSizeQueue;
 	}
 	
-	static void makeFoloorBuildPlan() {
-
+	static Queue<FloorSizeDeliveryDetails> makeFoloorBuildPlan(Queue<FloorSizeDeliveryDetails> deliveryDetailQ) {
+         
+		FloorSizeDeliveryDetails previousRef = null;
+		
+		//Instead of priniting the plan here, lets return another list to use by display method
+		Queue<FloorSizeDeliveryDetails> schedule = new LinkedList<FloorSizeDeliveryDetails>();
+		
+		while(!deliveryDetailQ.isEmpty()) {
+			
+			FloorSizeDeliveryDetails detail = deliveryDetailQ.poll();
+			
+			if(previousRef == null) {
+				previousRef = detail;
+			}
+			else if(detail.dayOfDelivery > previousRef.dayOfDelivery) {
+				previousRef = detail;
+			}
+			
+			detail.setTargetDayOfBuilding(previousRef.dayOfDelivery);
+			schedule.offer(detail);
+		}
+		return schedule;
 	}
  	
 	
-	static void displayFloorBuildPlan() {
+	static void displayFloorBuildPlan(Queue<FloorSizeDeliveryDetails> builderPlanQ) {
 		
+		FloorSizeDeliveryDetails previousRef = null;
+		
+		while(!builderPlanQ.isEmpty()) {
+			
+			FloorSizeDeliveryDetails detail = builderPlanQ.poll();
+			if(previousRef == null) {
+				for(int day = 1; day <= detail.getTargetDayOfBuilding(); day++) {
+					System.out.println("\n\nDay: " + day);
+				}
+				System.out.print(detail.floorSize + " ");
+				previousRef = detail;
+			}
+			else if(previousRef.getTargetDayOfBuilding() == detail.getTargetDayOfBuilding()) {
+				System.out.print(detail.floorSize + " ");
+			}
+			else {
+				for(int day = previousRef.getTargetDayOfBuilding() + 1; day <= detail.getTargetDayOfBuilding(); day++) {
+					System.out.println("\n\nDay: " + day);
+				}
+				System.out.print(detail.floorSize + " ");
+				previousRef = detail;
+			}
+		}
 	}
 
 	public static void main(String[] args) {
@@ -69,49 +127,19 @@ public class BuilderFloorSheduler {
 		
 		do {
 			
-			System.out.println("Enter the total no of floors in the building");
-			int noOfFloors = scanner.nextInt();
-
-			PriorityQueue<FloorSizeDeliveryDetails> floorSizeQueue = new PriorityQueue<FloorSizeDeliveryDetails>(noOfFloors, new FloorSizeDetailsComparator());
-
-			for (int day = 1; day <= noOfFloors; day++) {
-				
-				System.out.println("Enter the floor size given on day : " + day);
-				int size = scanner.nextInt(); 
-				
-				FloorSizeDeliveryDetails detail = new FloorSizeDeliveryDetails(size, day);
-				floorSizeQueue.add(detail);
+			//Note: We can solve this problem by many ways. here used PriorityQ to use a custom comparator.
+			
+			PriorityQueue<FloorSizeDeliveryDetails> floorSizeQ = readDeliveryPlan(scanner);
+			Queue<FloorSizeDeliveryDetails> schedulePlanQ = makeFoloorBuildPlan(floorSizeQ);
+			displayFloorBuildPlan(schedulePlanQ);
+			
+			System.out.println("\n\nDo you want to repeat? :[ No-0, Yes-Any other value]");
+			if (scanner.hasNextInt()) {
+				option = scanner.nextInt();
 			}
-			
-			FloorSizeDeliveryDetails previousRef = null;
-			
-			Queue<FloorSizeDeliveryDetails> schedule = new LinkedList<FloorSizeDeliveryDetails>();
-			
-			while(!floorSizeQueue.isEmpty()) {
-				FloorSizeDeliveryDetails detail = floorSizeQueue.poll();
-				System.out.println(" ---> " + detail.dayOfDelivery + " " + detail.floorSize );
-				
-				if(previousRef == null) {
-					previousRef = detail;
-				}
-				else if(detail.dayOfDelivery > previousRef.dayOfDelivery) {
-					previousRef = detail;
-				}
-				
-				detail.setTargetDayOfBuilding(previousRef.dayOfDelivery);
-				schedule.offer(detail);
+			else {
+				option = Integer. parseInt(scanner.nextLine());
 			}
-			
-			System.out.println("\n");
-			while(!schedule.isEmpty()) {
-				
-				FloorSizeDeliveryDetails detail = schedule.poll();
-				System.out.println(" ---> " + detail.floorSize + " " + detail.getTargetDayOfBuilding());
-			}
-			
-			System.out.println("\nDo you want to repeat? :[ No-0, Yes-Any other value]");
-			option = scanner.nextInt();
-			
 
 		} while (option != 0);
 		

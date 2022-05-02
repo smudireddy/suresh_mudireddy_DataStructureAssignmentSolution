@@ -1,8 +1,6 @@
 package com.gl.iitr.dsalab.a1;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -43,74 +41,73 @@ class FloorSizeDetailsComparator implements Comparator<FloorSizeDeliveryDetails>
 }
 
 public class BuilderFloorSheduler {
-	
+
 	public BuilderFloorSheduler() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	static PriorityQueue<FloorSizeDeliveryDetails> readDeliveryPlan(Scanner scanner) {
-		
+
 		System.out.println("Enter the total no of floors in the building");
 		int noOfFloors = scanner.nextInt();
 
-		PriorityQueue<FloorSizeDeliveryDetails> floorSizeQueue = new PriorityQueue<FloorSizeDeliveryDetails>(noOfFloors, new FloorSizeDetailsComparator());
+		PriorityQueue<FloorSizeDeliveryDetails> floorSizeQueue = new PriorityQueue<FloorSizeDeliveryDetails>(noOfFloors,
+				new FloorSizeDetailsComparator());
 
 		for (int day = 1; day <= noOfFloors; day++) {
-			
+
 			System.out.println("Enter the floor size given on day : " + day);
-			int size = scanner.nextInt(); 
-			
+			int size = scanner.nextInt();
+
 			FloorSizeDeliveryDetails detail = new FloorSizeDeliveryDetails(size, day);
 			floorSizeQueue.add(detail);
 		}
-		
+
 		return floorSizeQueue;
 	}
-	
+
 	static Queue<FloorSizeDeliveryDetails> makeFoloorBuildPlan(Queue<FloorSizeDeliveryDetails> deliveryDetailQ) {
-         
+
 		FloorSizeDeliveryDetails previousRef = null;
-		
-		//Instead of priniting the plan here, lets return another list to use by display method
+
+		// Instead of priniting the plan here, lets return another list to use by
+		// display method
 		Queue<FloorSizeDeliveryDetails> schedule = new LinkedList<FloorSizeDeliveryDetails>();
-		
-		while(!deliveryDetailQ.isEmpty()) {
-			
+
+		while (!deliveryDetailQ.isEmpty()) {
+
 			FloorSizeDeliveryDetails detail = deliveryDetailQ.poll();
-			
-			if(previousRef == null) {
+
+			if (previousRef == null) {
+				previousRef = detail;
+			} else if (detail.dayOfDelivery > previousRef.dayOfDelivery) {
 				previousRef = detail;
 			}
-			else if(detail.dayOfDelivery > previousRef.dayOfDelivery) {
-				previousRef = detail;
-			}
-			
+
 			detail.setTargetDayOfBuilding(previousRef.dayOfDelivery);
 			schedule.offer(detail);
 		}
 		return schedule;
 	}
- 	
-	
+
 	static void displayFloorBuildPlan(Queue<FloorSizeDeliveryDetails> builderPlanQ) {
-		
+
 		FloorSizeDeliveryDetails previousRef = null;
-		
-		while(!builderPlanQ.isEmpty()) {
-			
+
+		while (!builderPlanQ.isEmpty()) {
+
 			FloorSizeDeliveryDetails detail = builderPlanQ.poll();
-			if(previousRef == null) {
-				for(int day = 1; day <= detail.getTargetDayOfBuilding(); day++) {
+			if (previousRef == null) {
+				for (int day = 1; day <= detail.getTargetDayOfBuilding(); day++) {
 					System.out.println("\n\nDay: " + day);
 				}
 				System.out.print(detail.floorSize + " ");
 				previousRef = detail;
-			}
-			else if(previousRef.getTargetDayOfBuilding() == detail.getTargetDayOfBuilding()) {
+			} else if (previousRef.getTargetDayOfBuilding() == detail.getTargetDayOfBuilding()) {
 				System.out.print(detail.floorSize + " ");
-			}
-			else {
-				for(int day = previousRef.getTargetDayOfBuilding() + 1; day <= detail.getTargetDayOfBuilding(); day++) {
+			} else {
+				for (int day = previousRef.getTargetDayOfBuilding() + 1; day <= detail
+						.getTargetDayOfBuilding(); day++) {
 					System.out.println("\n\nDay: " + day);
 				}
 				System.out.print(detail.floorSize + " ");
@@ -120,29 +117,35 @@ public class BuilderFloorSheduler {
 	}
 
 	public static void main(String[] args) {
-		
+
 		Scanner scanner = new Scanner(System.in);
 
 		int option = 0;
-		
+
 		do {
-			
-			//Note: We can solve this problem by many ways. here used PriorityQ to use a custom comparator.
-			
+
+			// Note: We can solve this problem by many ways. here used PriorityQ to use a
+			// custom comparator.
+
+			// 1- fetch the delivery plan
 			PriorityQueue<FloorSizeDeliveryDetails> floorSizeQ = readDeliveryPlan(scanner);
+
+			// 2- Make the build plan based on floor size delivery plan
 			Queue<FloorSizeDeliveryDetails> schedulePlanQ = makeFoloorBuildPlan(floorSizeQ);
+
+			// 3-Display the prepared plan in the expected format
 			displayFloorBuildPlan(schedulePlanQ);
-			
+
+			// 4-Repeat for another plan
 			System.out.println("\n\nDo you want to repeat? :[ No-0, Yes-Any other value]");
 			if (scanner.hasNextInt()) {
 				option = scanner.nextInt();
-			}
-			else {
-				option = Integer. parseInt(scanner.nextLine());
+			} else {
+				option = Integer.parseInt(scanner.nextLine());
 			}
 
 		} while (option != 0);
-		
+
 		scanner.close();
 	}
 }

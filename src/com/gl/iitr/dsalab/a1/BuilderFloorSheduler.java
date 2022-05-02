@@ -70,7 +70,7 @@ public class BuilderFloorSheduler {
 
 		FloorSizeDeliveryDetails previousRef = null;
 
-		// Instead of priniting the plan here, lets return another list to use by
+		// Instead of printing the plan here, lets return another list to use by
 		// display method
 		Queue<FloorSizeDeliveryDetails> schedule = new LinkedList<FloorSizeDeliveryDetails>();
 
@@ -126,6 +126,8 @@ public class BuilderFloorSheduler {
 
 			// Note: We can solve this problem by many ways. here used PriorityQ to use a
 			// custom comparator.
+			// Other solution : Build left skewed BST from the input and change the target plan we did here with the method
+			// makeFoloorBuildPlan implemented here by traversing pre-order
 
 			// 1- fetch the delivery plan
 			PriorityQueue<FloorSizeDeliveryDetails> floorSizeQ = readDeliveryPlan(scanner);
